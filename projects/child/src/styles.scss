@@ -1,0 +1,18 @@
+html {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+}
+
+// Fix A: while embedded, move the CDK's global overlays (snack bar, dialog) into the part of the
+// iframe that is visible in the parent viewport (see ParentViewport). Connected overlays such as
+// menus or selects are not wrapped in .cdk-global-overlay-wrapper and stay where they are.
+html.parent-viewport-sync .cdk-global-overlay-wrapper {
+  top: var(--parent-viewport-top);
+  height: var(--parent-viewport-height);
+}

@@ -1,0 +1,49 @@
+<header #header class="app-header">
+  <mat-toolbar>
+    <span>Host-Applikation (Parent)</span>
+    <span class="spacer"></span>
+    <span class="toolbar-hint">fixer Header</span>
+  </mat-toolbar>
+</header>
+
+<main class="page">
+  <section class="intro">
+    <h1>Notifications aus einem iframe</h1>
+    <p>
+      Unten ist die Child-App per <code>&lt;iframe&gt;</code> eingebunden. iframe-resizer passt die
+      Höhe des iframes laufend an dessen Inhalt an. Das iframe hat darum nie eine eigene Scrollbar,
+      gescrollt wird immer hier im Parent.
+    </p>
+    <ol>
+      <li>Im iframe einen Modus wählen.</li>
+      <li>Nach unten scrollen und bei einem Auftrag weit unten auf «Speichern» klicken.</li>
+      <li>Beobachten, wo die Notification erscheint (und was beim Weiterscrollen passiert).</li>
+    </ol>
+  </section>
+
+  <section class="tiles">
+    @for (tile of ['Offene Aufträge', 'Lieferungen heute', 'Reklamationen']; track tile) {
+      <div class="tile">
+        <span class="tile-label">{{ tile }}</span>
+        <span class="tile-value">{{ ($index + 1) * 7 }}</span>
+      </div>
+    }
+  </section>
+
+  <section class="frame">
+    <div class="frame-label">
+      &lt;iframe&gt; {{ childUrl }} · Höhe via iframe-resizer: {{ iframeHeight() ?? '…' }}px
+    </div>
+    <iframe
+      title="Child-App"
+      [src]="iframeSrc"
+      hostIframeResizer
+      (resized)="iframeHeight.set($event)"
+      hostViewportBridge
+      [fixedHeader]="header"
+      hostNotificationRelay
+    ></iframe>
+  </section>
+
+  <footer class="footer">Parent-Inhalt unterhalb des iframes</footer>
+</main>

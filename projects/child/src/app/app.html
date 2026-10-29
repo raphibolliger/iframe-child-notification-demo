@@ -1,0 +1,43 @@
+<div class="page">
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Child-App</mat-card-title>
+      <mat-card-subtitle>
+        @if (isEmbedded) {
+          Läuft eingebettet im iframe des Parents
+        } @else {
+          Läuft standalone (direkt im Browser geöffnet)
+        }
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <mat-radio-group class="modes" [value]="mode()" (change)="mode.set($event.value)">
+        @for (option of modes; track option.value) {
+          <mat-radio-button [value]="option.value">
+            <span class="mode-label">{{ option.label }}</span>
+            <span class="mode-description">{{ option.description }}</span>
+          </mat-radio-button>
+        }
+      </mat-radio-group>
+
+      @if (visibleArea(); as area) {
+        <p class="visible-area">
+          Sichtbarer Teil des iframes: {{ area.top }}px bis {{ area.top + area.height }}px
+        </p>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <h2>Aufträge</h2>
+  <ul class="orders">
+    @for (order of orders; track order.id) {
+      <li class="order">
+        <span class="order-id">#{{ order.id }}</span>
+        <span class="order-customer">{{ order.customer }}</span>
+        <span class="order-status">{{ order.status }}</span>
+        <button mat-stroked-button (click)="save(order)">Speichern</button>
+      </li>
+    }
+  </ul>
+</div>
