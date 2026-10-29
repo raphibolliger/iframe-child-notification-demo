@@ -1,7 +1,7 @@
 # iFrame-Notification Demo
 
 Prototyp für folgendes Problem: Eine Angular-App läuft in einem `<iframe>` innerhalb einer anderen
-Angular-App. [iframe-resizer](https://github.com/davidjbradshaw/iframe-resizer) (v4) macht das
+Angular-App. [iframe-resizer](https://github.com/davidjbradshaw/iframe-resizer) (v5) macht das
 iframe immer so hoch wie seinen Inhalt, darum scrollt nur der Parent. Notifications im iframe
 (Angular Material Snackbar oben rechts) verschwinden, sobald man im Parent nach unten scrollt.
 
@@ -11,6 +11,8 @@ direkt im iframe umschalten.
 **Live-Demo:** https://raphibolliger.github.io/iframe-child-notification-demo/
 
 ## Lokal starten
+
+Voraussetzung: Node 22.22.3+ oder 24.15+ (siehe `.nvmrc`).
 
 ```bash
 npm ci
@@ -105,21 +107,19 @@ Autocomplete hängen an ihrem Auslöser-Element und bleiben unverändert.
 Die Berechnung steckt in [`parent-viewport.ts`](projects/child/src/app/parent-viewport.ts). Für die
 Herkunft der Position gibt es zwei Varianten:
 
-#### A1: iframe-resizer `getPageInfo()` (nur das Child ändern)
+#### A1: iframe-resizer `getParentProps()` (nur das Child ändern)
 
-Der Parent-Teil von iframe-resizer kann dem Child bereits Scroll-Position und Lage des iframes
-melden: `window.parentIFrame.getPageInfo(callback)`. Im Parent muss nichts geändert werden.
+Der Parent-Teil von iframe-resizer kann dem Child bereits melden, wo das iframe im Viewport liegt:
+`window.parentIFrame.getParentProps(callback)` liefert u.a. `iframe.top` und `viewport.height`, bei
+jedem Scroll und Resize neu. Im Parent muss nichts geändert werden.
 
 Einschränkungen:
 
 - iframe-resizer hört nur auf Scroll und Resize des **Windows**. Scrollt im Parent ein innerer
-  Container (typisch bei `mat-sidenav-container`, dort scrollt `mat-sidenav-content`), kommen keine
-  Updates. Getestet: Die Snackbar landet dann wieder ausserhalb.
+  Container (typisch bei `mat-sidenav-container`, dort scrollt `mat-sidenav-content`), kommen beim
+  Scrollen keine Updates. Getestet: Die Snackbar bleibt dann beim Scrollen zurück und verschwindet.
 - Fixe Elemente im Parent (Header) kennt iframe-resizer nicht. Das Child muss deren Höhe selber
   wissen (`PARENT_HEADER_HEIGHT`).
-- Updates kommen gedrosselt (ca. alle 32ms).
-- In iframe-resizer v5 heisst das Pendant `getParentProps()` (liefert u.a. `iframe.top` und
-  `viewport.height`).
 
 #### A2: Viewport-Bridge (kleine Erweiterung im Parent)
 
@@ -166,7 +166,7 @@ meldet zurück, wenn sie geschlossen wurde und ob über die Aktion. So funktioni
 
 ## Vergleich
 
-|                                      | A1 getPageInfo         | A2 Viewport-Bridge       | B Parent zeigt an        |
+|                                      | A1 getParentProps      | A2 Viewport-Bridge       | B Parent zeigt an        |
 | ------------------------------------ | ---------------------- | ------------------------ | ------------------------ |
 | Änderung im Parent                   | keine                  | Direktive auf dem iframe | Direktive auf dem iframe |
 | Innerer Scroll-Container im Parent   | nein                   | ja                       | ja                       |
@@ -206,9 +206,13 @@ projects/
 
 ## Hinweise
 
-- iframe-resizer 4.4.5 (MIT). Version 5 (`@iframe-resizer/parent` und `@iframe-resizer/child`) ist
-  unter GPLv3 oder kommerzieller Lizenz verfügbar, das Prinzip bleibt dasselbe.
+- iframe-resizer 5 (`@iframe-resizer/parent` und `@iframe-resizer/child`) steht unter GPLv3 oder
+  einer kommerziellen Lizenz. Das öffentliche Demo verwendet den Lizenz-Key `'GPLv3'` (daher der
+  Lizenzhinweis in der Konsole), in einer Closed-Source-App gehört dort euer kommerzieller Key hin.
+  `@iframe-resizer/angular` gibt es aktuell nur als Beta, darum bindet eine eigene kleine Direktive
+  den Parent-Teil ein.
 - Alle `postMessage`-Empfänger prüfen `event.origin` und `event.source`, gesendet wird immer an eine
   konkrete Ziel-Origin statt an `'*'`. Die Origins kommen im Demo aus den Environment-Dateien, in
   einer echten App aus der Konfiguration.
-- Angular 21 und Material 21, damit es mit Node 20.19+, 22 und 24 läuft.
+- Angular 22 und Angular Material 22. Die Komponenten nutzen Signals und damit den neuen
+  Standard `OnPush`.

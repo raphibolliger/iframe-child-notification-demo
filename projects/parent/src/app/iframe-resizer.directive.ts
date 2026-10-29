@@ -1,8 +1,8 @@
 import { afterNextRender, DestroyRef, Directive, ElementRef, inject, output } from '@angular/core';
-import iframeResize from 'iframe-resizer/js/iframeResizer';
+import iframeResize from '@iframe-resizer/parent';
 
 /**
- * The basic setup: iframe-resizer (v4) keeps the iframe as tall as its content,
+ * The basic setup: iframe-resizer (v5) keeps the iframe as tall as its content,
  * so the iframe never scrolls itself and only the parent page scrolls.
  */
 @Directive({ selector: 'iframe[hostIframeResizer]' })
@@ -15,14 +15,16 @@ export class IframeResizerDirective {
     const destroyRef = inject(DestroyRef);
 
     afterNextRender(() => {
-      iframeResize(
+      const [resizedIframe] = iframeResize(
         {
+          // Open-source license key, fine for this public demo. Closed-source apps need a commercial key.
+          license: 'GPLv3',
           checkOrigin: true,
-          onResized: ({ height }) => this.resized.emit(Number(height)),
+          onResized: ({ height }) => this.resized.emit(height),
         },
         iframe,
       );
-      destroyRef.onDestroy(() => iframe.iFrameResizer?.removeListeners());
+      destroyRef.onDestroy(() => resizedIframe.iFrameResizer.disconnect());
     });
   }
 }

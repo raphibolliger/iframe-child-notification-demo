@@ -18,9 +18,9 @@ export const NOTIFICATION_MODES: NotificationModeOption[] = [
   },
   {
     value: 'resizer',
-    label: 'Fix A1: iframe-resizer getPageInfo()',
+    label: 'Fix A1: iframe-resizer getParentProps()',
     description:
-      'Das Child holt die Scroll-Position des Parents über iframe-resizer und verschiebt seine ' +
+      'Das Child holt die Lage des iframes im Parent über iframe-resizer und verschiebt seine ' +
       'Overlays in den sichtbaren Bereich. Keine Änderung im Parent nötig, aber nur Window-Scrolling ' +
       'und die Höhe des fixen Parent-Headers muss das Child selber kennen.',
   },

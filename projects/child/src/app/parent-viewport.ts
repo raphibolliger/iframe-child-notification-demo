@@ -8,7 +8,7 @@ import { parentIFrameReady } from '../iframe-resizer-child';
 import { isEmbedded, PARENT_ORIGIN } from './embedding';
 import { NotificationModeStore } from './notification-mode';
 
-/** getPageInfo() knows nothing about fixed UI in the parent, so the child has to know the header height itself. */
+/** getParentProps() knows nothing about fixed UI in the parent, so the child has to know the header height itself. */
 const PARENT_HEADER_HEIGHT = 64;
 
 /** Part of this document that is visible in the parent viewport, in child pixels. */
@@ -47,23 +47,24 @@ export class ParentViewport {
     inject(DestroyRef).onDestroy(() => this.reset());
   }
 
-  /** Fix A1: the parent part of iframe-resizer already reports the parent's scroll position. */
+  /** Fix A1: the parent part of iframe-resizer already reports where the iframe is. */
   private trackViaIframeResizer(): () => void {
     let active = true;
+    let stop: (() => void) | undefined;
     parentIFrameReady.then((parentIFrame) => {
       if (active) {
-        parentIFrame.getPageInfo(({ offsetTop, scrollTop, clientHeight }) =>
+        stop = parentIFrame.getParentProps(({ iframe, viewport }) =>
           this.update({
-            iframeTop: offsetTop - scrollTop,
+            iframeTop: iframe.top,
             viewportTop: PARENT_HEADER_HEIGHT,
-            viewportBottom: clientHeight,
+            viewportBottom: viewport.height,
           }),
         );
       }
     });
     return () => {
       active = false;
-      window.parentIFrame?.getPageInfo(false);
+      stop?.();
       this.reset();
     };
   }

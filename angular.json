@@ -60,7 +60,7 @@
               "projects/parent/src/styles.scss"
             ],
             "allowedCommonJsDependencies": [
-              "iframe-resizer"
+              "@iframe-resizer/parent"
             ]
           },
           "configurations": {
@@ -165,7 +165,7 @@
               "projects/child/src/styles.scss"
             ],
             "allowedCommonJsDependencies": [
-              "iframe-resizer"
+              "@iframe-resizer/child"
             ]
           },
           "configurations": {
